@@ -30,9 +30,9 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN ln -s /etc/apache2/mods-available/rewrite.load /etc/apache2/mods-enabled/rewrite.load
 RUN a2enmod rewrite
 
-RUN cd /tmp && curl -L https://raw.githubusercontent.com/topcueser/oci8-instantclient/master/instantclient-basiclite-linux.x64-19.3.0.0.0dbru.zip -O
-RUN cd /tmp && curl -L https://raw.githubusercontent.com/topcueser/oci8-instantclient/master/instantclient-sdk-linux.x64-19.3.0.0.0dbru.zip -O
-RUN cd /tmp && curl -L https://raw.githubusercontent.com/topcueser/oci8-instantclient/master/instantclient-sqlplus-linux.x64-19.3.0.0.0dbru.zip -O
+RUN cd /tmp && curl -L https://raw.githubusercontent.com/topcueser/docker-files/master/oci8-instantclient/instantclient-basiclite-linux.x64-19.3.0.0.0dbru.zip -O
+RUN cd /tmp && curl -L https://raw.githubusercontent.com/topcueser/docker-files/master/oci8-instantclient/instantclient-sdk-linux.x64-19.3.0.0.0dbru.zip -O
+RUN cd /tmp && curl -L https://raw.githubusercontent.com/topcueser/docker-files/master/oci8-instantclient/instantclient-sqlplus-linux.x64-19.3.0.0.0dbru.zip -O
 
 RUN unzip /tmp/instantclient-basiclite-linux.x64-19.3.0.0.0dbru.zip -d /usr/local/
 RUN unzip /tmp/instantclient-sdk-linux.x64-19.3.0.0.0dbru.zip -d /usr/local/
