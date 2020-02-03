@@ -1,0 +1,85 @@
+FROM php:5.6-apache
+
+# install pecl
+RUN curl -O http://pear.php.net/go-pear.phar \
+    ; /usr/local/bin/php -d detect_unicode=0 go-pear.phar
+
+# PHP extensions
+RUN apt-get update && apt-get install -y \
+        unzip \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libmcrypt-dev \
+        libpng-dev \
+        libaio1 \
+        vim \
+        libzip-dev \
+        libpq-dev \
+    && docker-php-ext-install -j$(nproc) iconv gettext \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-install mbstring \
+    && docker-php-ext-install pdo pdo_mysql \
+    && docker-php-ext-install pdo_pgsql \
+    && docker-php-ext-install pgsql
+
+#Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# apache configurations, mod rewrite
+RUN ln -s /etc/apache2/mods-available/rewrite.load /etc/apache2/mods-enabled/rewrite.load
+RUN a2enmod rewrite
+
+RUN cd /tmp && curl -L https://raw.githubusercontent.com/topcueser/oci8-instantclient/master/instantclient-basiclite-linux.x64-19.3.0.0.0dbru.zip -O
+RUN cd /tmp && curl -L https://raw.githubusercontent.com/topcueser/oci8-instantclient/master/instantclient-sdk-linux.x64-19.3.0.0.0dbru.zip -O
+RUN cd /tmp && curl -L https://raw.githubusercontent.com/topcueser/oci8-instantclient/master/instantclient-sqlplus-linux.x64-19.3.0.0.0dbru.zip -O
+
+RUN unzip /tmp/instantclient-basiclite-linux.x64-19.3.0.0.0dbru.zip -d /usr/local/
+RUN unzip /tmp/instantclient-sdk-linux.x64-19.3.0.0.0dbru.zip -d /usr/local/
+RUN unzip /tmp/instantclient-sqlplus-linux.x64-19.3.0.0.0dbru.zip -d /usr/local/
+
+RUN ln -s /usr/local/instantclient_19_3 /usr/local/instantclient
+RUN ln -s /usr/local/instantclient/lib* /usr/lib
+RUN ln -s /usr/local/instantclient/sqlplus /usr/bin/sqlplus
+
+RUN echo 'export LD_LIBRARY_PATH="/usr/local/instantclient"' >> /root/.bashrc
+RUN echo 'umask 002' >> /root/.bashrc
+
+RUN echo 'instantclient,/usr/local/instantclient' | pecl install oci8-2.0.12
+RUN echo "extension=oci8.so" > /usr/local/etc/php/conf.d/php-oci8.ini
+
+RUN mkdir -p /var/www
+WORKDIR /var/www
+RUN chown www-data:www-data /var/www/
+
+EXPOSE 80
+
+# docker exec -it <mycontainer> bash
+
+# docker rm CONTAINERID -f
+
+# docker rmi IMAGEID -f
+
+# docker exec -it <mycontainer> bash
+
+# docker rm CONTAINERID -f
+
+# docker rmi IMAGEID -f
+
+# ------------> docker-compose.yml oldugu icin asagidaki komutlar [ proje dizini icerisinde ] <-------------
+
+# docker-compose -f docker/5.6/docker-compose.yml build    --> yeni container olusturmak icin
+
+# docker-compose -f docker/5.6/docker-compose.yml up -d    --> olusturulan container calistirmak icin
+
+# docker-compose build          --> proje dizininde yml ile aynı yerde
+
+# docker-compose up -d          --> calistir [ proje dizininde yml ile aynı yerde ]
+
+# docker-compose down           --> durdur  [ proje dizininde yml ile aynı yerde ]
+
+# docker container start CONTAINERNAME     --> containerlar arasinda gecis yapmak icin
+
+# docker container stop CONTAINERNAME
+
+# docker container restart CONTAINERNAME
