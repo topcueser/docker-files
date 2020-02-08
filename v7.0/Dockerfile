@@ -15,13 +15,12 @@ RUN apt-get update && apt-get install -y \
         vim \
         libzip-dev \
         libpq-dev \
+        libxml2-dev \
         git \
-    && docker-php-ext-install -j$(nproc) iconv gettext \
+    && docker-php-ext-install -j$(nproc) iconv gettext mcrypt dom zip \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-install mbstring \
-    #&& docker-php-ext-install mcrypt-1.0.1 \
-    #&& docker-php-ext-enable mcrypt \
     && docker-php-ext-install pdo pdo_mysql \
     && docker-php-ext-install pdo_pgsql \
     && docker-php-ext-install pgsql
